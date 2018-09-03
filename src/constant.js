@@ -6,7 +6,7 @@ const DEFAULT_NETWORK = 'ropsten' // mainnet/ropsten/kovan
 const DEFAULT_GET_RECEIPT = false
 const DEFAULT_MAX_PROCESS_TXS = 5
 const TRADE_TOPPIC = "0x1849bd6a030a1bca28b83437fd3de96f3d27a5d172fa7e9c78e7b61468928a39"
-const DEFAULT_SQL_PATH = './src/db/txs.db'
+const DEFAULT_SQL_PATH = './monitor-tx.db'
 
 const DEFAULT_MINE_CALLBACK = () => {}
 const DEFAULT_CONFIRM_CALLBACK = () => {}
