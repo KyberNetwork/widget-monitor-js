@@ -1,0 +1,22 @@
+{
+  "tokens": {},
+  "endpoint_blockchain": [
+    {
+      "endPoint": "https://kovan.infura.io/DtzEYY0Km2BA3YwyJcBG",
+      "type": "prune"
+    },
+    {
+      "endPoint": "https://kovan.infura.io",
+      "type": "prune"
+    },
+    {
+      "endPoint": "https://kovan.infura.io",
+      "type": "none_prune"
+    },
+    {
+      "endPoint": "https://kovan.infura.io",
+      "type": "prune"
+    }
+  ],
+  "network": "0x0a56d8a49E71da8d7F9C65F95063dB48A3C9560B"
+}

@@ -1,0 +1,45 @@
+{
+  "tokens": {
+    "ETH": {
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "icon": "eth.svg",
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "decimals": 18,
+      "usd_id":"ethereum"
+    },
+    "KNC": {
+      "name": "KyberNetwork",
+      "symbol": "KNC",
+      "icon": "knc.svg",
+      "address": "0x4e470dc7321e84ca96fcaedd0c8abcebbaeb68c6",
+      "decimals": 18,
+      "usd_id":"kyber-network"
+    },
+    "OMG": {
+      "name": "OmiseGO",
+      "symbol": "OMG",
+      "icon": "omg.svg",
+      "address": "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b",
+      "decimals": 18,
+      "usd_id":"omisego"
+    },
+    "BBO": {
+      "name": "BigBom",
+      "symbol": "BBO",
+      "icon": "bbo.svg",
+      "address": "0xa94758d328af7ef1815e73053e95b5f86588c16d",
+      "decimals": 18,
+      "usd_id":"omisego"
+    },
+    "GTO": {
+      "name": "Gifto",
+      "symbol": "GTO",
+      "icon": "gifto.svg",
+      "address": "0xe55c607d58c53b2b06a8e38f67f4c0fcaeed2c31",
+      "decimals": 5,
+      "usd_id":"gifto"
+    }
+  },
+  "network": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755"
+}
