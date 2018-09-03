@@ -30,6 +30,8 @@ module.exports = class ScheduleTask {
     this.EthereumService.callMultiNode('exactTradeData', txData.input)
     .then(tradeData => {
       const inputTokenSymbol = this.MappedTokens[tradeData.src.toLowerCase()]
+      if(!inputTokenSymbol) return callback("token not support by Kyber!")
+
       const inputAmount = converter.toToken(tradeData.srcAmount, this.BlockchainInfo.tokens[inputTokenSymbol].decimals)
 
       const receiptLogs = receipt.logs
@@ -146,6 +148,7 @@ module.exports = class ScheduleTask {
     }, (err, results) => {
       if(err) {
         /// handle tx pending or lost
+        console.log(err)
         const now = new Date().getTime()
         if(now - tx.timeStamp > this.lostTimeout) return finishCallback(null, { status: CONSTANTS.TRANSACTION_STATUS.LOST})
         else return callback(null, {pending: true})
