@@ -2,18 +2,25 @@ const sqlite3 = require('sqlite3').verbose()
 
 module.exports = class SqliteStorage {
   constructor(path){
-    this.db = new sqlite3.Database(path, (err) => {
+    this.path = path
+    this.initDb(err => {
+      if(err) console.log(err)
+
+      this.updatetimeStampTxs()
+    })
+  }
+
+  initDb(callback){
+    this.db = new sqlite3.Database(this.path, (err) => {
       if (err) {
         console.error(err.message);
       } else {
         console.log('Connected to the sqlite3 database.');
+
+        let sql = `CREATE TABLE IF NOT EXISTS txs (id INTEGER PRIMARY KEY AUTOINCREMENT, hash STRING UNIQUE, blockConfirm STRING, timeStamp INTEGER, amount STRING, symbol STRING)`
+        this.db.all(sql, [], callback)
       }
     });
-  }
-
-  initDb(callback){
-    let sql = `CREATE TABLE IF NOT EXISTS txs (id INTEGER PRIMARY KEY AUTOINCREMENT, hash STRING UNIQUE, blockConfirm STRING, timeStamp INTEGER, amount STRING, symbol STRING)`
-    this.db.all(sql, [], callback)
   }
 
   findByHash(hash, callback) {

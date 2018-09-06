@@ -37,7 +37,7 @@ const init = (config) => {
   var confirmCallback = config.confirmCallback || CONSTANTS.DEFAULT_CONFIRM_CALLBACK
   var sqlPath = config.sqlPath || CONSTANTS.DEFAULT_SQL_PATH
 
-  this.txs = new Txs(sqlPath)
+  this.txs = config.sqlIntance || new Txs(sqlPath)
   this.txs.initDb((err, result) => {
     if(err) return console.log(err)
 
@@ -54,10 +54,9 @@ const init = (config) => {
     }
     var scheduleTask = new ScheduleTask(params)
 
-    this.txs.updatetimeStampTxs()
+    // this.txs.updatetimeStampTxs()
 
     cron.schedule(expression, () => {
-
       this.txs.getAll( (err, txs) => {
         if(err) return
         scheduleTask.exec(txs, (tx) => {
