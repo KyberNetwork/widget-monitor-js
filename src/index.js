@@ -63,10 +63,6 @@ const init = (config) => {
           removeTx(tx.hash)
         })
       })
-
-      
-
-
     });
 
 

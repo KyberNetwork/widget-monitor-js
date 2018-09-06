@@ -1,4 +1,7 @@
 module.exports = {
   hash: String,
-  blockConfirm: Number
+  blockConfirm: Number,
+  timeStamp: Number,
+  amount: String,
+  symbol: String
 }

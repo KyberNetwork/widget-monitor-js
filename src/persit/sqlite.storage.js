@@ -23,16 +23,35 @@ module.exports = class SqliteStorage {
     });
   }
 
+  /**
+   * Find tx by hash
+   * @param {string} hash 
+   * @param {function} callback 
+   */
   findByHash(hash, callback) {
     let sql = `SELECT * FROM txs WHERE LOWER(hash) = ?`
     return this.db.all(sql, [hash.toLowerCase()], callback)
   }
 
+  /**
+   * Get call txs in database
+   * @param {function} callback 
+   */
   getAll(callback){
     let sql = `SELECT * FROM txs`
     return this.db.all(sql, [], callback)
   }
 
+  /**
+   * Add tx to database
+   * @param {tx object data} data 
+   * {
+   *      hash: String,
+   *      amount: String,
+   *      symbol: String
+   * }
+   * @param {function} callback 
+   */
   addTx(data, callback){
     let columns = Object.keys(data).join(',')
     let columns_mask = new Array(Object.keys(data).length + 1).join('?').split('').join(',')
@@ -44,6 +63,11 @@ module.exports = class SqliteStorage {
     this.db.run(sql, values, callback)
   }
 
+  /**
+   * remove tx with hash from database
+   * @param {string} hash 
+   * @param {function} callback 
+   */
   removeTxByHash(hash, callback){
     let sql = `DELETE FROM txs WHERE LOWER(hash) = ?`
     return this.db.all(sql, [hash.toLowerCase()], callback)

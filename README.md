@@ -41,6 +41,7 @@ we can pass manual config for monitor task
 |     sqlPath             |     String                           |    Path to sqlite db                                                             |
 |     mineCallback        |     Function                         |    Callback call each time cron fetched tx data, but confirm block is not enough |
 |     confirmCallback     |     Function                         |    Callback call when block confirm is enough or tx lost                         |
+|     sqlIntance          |     Class                            |    Database instance                                                             |
 
 Default value:
 ```
@@ -181,6 +182,54 @@ when tx pending
 ```
 err: null 
 { pending: true }
+```
+
+
+#### abtract database
+you can manual option which database use by passing database instance to config
+Database instance is an class which contain all of this method:
+
+```
+  /**
+   * Find tx by hash
+   * @param {string} hash 
+   * @param {function} callback 
+   */
+  findByHash(hash, callback)
+
+  /**
+   * Get call txs in database
+   * @param {function} callback 
+   */
+  getAll(callback)
+
+  /**
+   * Add tx to database
+   * @param {tx object data} data 
+   * {
+   *      hash: String,
+   *      amount: String,
+   *      symbol: String
+   * }
+   * @param {function} callback 
+   */
+  addTx(data, callback)
+
+  /**
+   * remove tx with hash from database
+   * @param {string} hash 
+   * @param {function} callback 
+   */
+  removeTxByHash(hash, callback){
+```
+
+txs schema
+```
+hash: String,
+blockConfirm: Number,
+timeStamp: Number,
+amount: String,
+symbol: String
 ```
 
 
