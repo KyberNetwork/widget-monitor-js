@@ -9,9 +9,9 @@ $ npm install --save monitor-tx
 
 ## Usage
 
-Monitor-tx is an module for node.js which provides easy way to validate transaction made by Kyber.Network widget. It will create a cron job, interval check status off all tx added. Then call Callback function each time fetched data of tx. There are 2 types of callback function:
-- mineCallback: call when schedule task fetched tx data from network, but confirm block is not enough
-- confirmCallback: call when all data is fetched and enough blockconfirm; or tx lost
+Monitor-tx is a node.js module which provides an easy way to validate transaction made by Kyber Widget. It creates a cron job to periodicly check status off every registered tx. Callback function is also fired each time a tx status is changed. There are 2 types of callback function:
+- mineCallback: it is called when the tx is mined, however it will not be considered as a successful tx until a certain number of block confirmation.
+- confirmCallback: it is called when the tx is mined and persisted for at least a certain number of block confirmation or the tx is considered lost for being notfound for more than 15 minutes. At this point, status of the tx can be `lost`, `success`, `failed`.
 
 
 ### Method
