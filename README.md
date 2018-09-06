@@ -189,7 +189,7 @@ err: null
 you can manual option which database use by passing database instance to config.
 Database instance is an class which contain all of this method:
 
-```
+```javascript
   /**
    * Find tx by hash
    * @param {string} hash 
@@ -220,7 +220,7 @@ Database instance is an class which contain all of this method:
    * @param {string} hash 
    * @param {function} callback 
    */
-  removeTxByHash(hash, callback){
+  removeTxByHash(hash, callback)
 ```
 
 txs schema
