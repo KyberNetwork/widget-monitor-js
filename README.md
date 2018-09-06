@@ -186,7 +186,7 @@ err: null
 
 
 #### abtract database
-you can manual option which database use by passing database instance to config
+you can manual option which database use by passing database instance to config.
 Database instance is an class which contain all of this method:
 
 ```
