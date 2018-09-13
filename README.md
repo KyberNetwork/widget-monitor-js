@@ -18,7 +18,7 @@ When user makes a transaction, the workflow is as following:
 4. Monitor-tx calls your confirmCallback when the tx is mined and persisted for at least a certain number of block confirmation or the tx is considered lost for being notfound for more than 15 minutes. At this point, status of the tx can be `lost`, `success`, `failed`, `invalid`.
 
 The tx is considered invalid if one of the following is true.
-1. The receiving address is different from receiveAddr passed Kyber Widget
+1. The receiving address is different from receiveAddr passed to Kyber Widget
 2. The receiving token is different from receiveToken passed to Kyber Widget
 3. The receiving amount is less than receiveAmount passed to Kyber Widget
 
@@ -26,7 +26,7 @@ Within confirmCallback, make sure to check if status is `success` before proceed
 
 Internally, the monitor-tx instance periodically polls blockchain nodes to query tx status. The polling interval is configurable.
 
-By default, monitor-tx persist the tx queue to a SqLite DB, so transactions will not be lost if the process restarts. You could change from SqLite to other storage if desired.
+By default, monitor-tx persist the tx queue to a SqLite DB, so transactions will not be lost if the running process restarts. You could change from SqLite to other kind of storage if desired.
 
 ### Methods
 | method               |   Detail  
@@ -193,7 +193,7 @@ app.post('/payment/callback', function(req, res, next) {
   confirmTransaction: { status: 'success', amount: 0.7653, symbol: 'KNC' } }
 ```
 
-#### Use custom tx storage
+#### Use a custom tx storage
 You could change the tx storage from default of SqLite to one of your own (e.g. in-memory, file, MySql, MongoDB, etc.) by passing a storage object to monitor-tx's `init` method.
 
 Example:
