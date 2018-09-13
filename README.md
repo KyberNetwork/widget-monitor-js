@@ -9,41 +9,48 @@ $ npm install --save monitor-tx
 
 ## Usage
 
-Monitor-tx is a node.js module which provides an easy way to validate transaction made by Kyber Widget. It creates a cron job to periodicly check status off every registered tx. Callback function is also fired each time a tx status is changed. There are 2 types of callback function:
-- mineCallback: it is called when the tx is mined, however it will not be considered as a successful tx until a certain number of block confirmation.
-- confirmCallback: it is called when the tx is mined and persisted for at least a certain number of block confirmation or the tx is considered lost for being notfound for more than 15 minutes. At this point, status of the tx can be `lost`, `success`, `failed`.
+Monitor-tx is a node.js module which provides an convenient way to validate transactions made through Kyber Widget.
 
+When user makes a transaction, the workflow is as following:
+1. Kyber Widget calls your supplied callback URL, passing the tx hash
+2. Your server code then need to add the tx hash to monitor-tx queue, passing mineCallback and confirmCallback as parameters
+3. Monitor-tx calls your mineCallback when the tx gets mined, however it will not be considered as a successful tx until a certain number of block confirmation.
+4. Monitor-tx calls your confirmCallback when the tx is mined and persisted for at least a certain number of block confirmation or the tx is considered lost for being notfound for more than 15 minutes. At this point, status of the tx can be `lost`, `success`, `failed`.
 
-### Method
+Internally, the monitor-tx instance periodically polls blockchain nodes to query tx status. The polling interval is configurable.
+
+By default, monitor-tx persist tx queue to a Sqlite DB, so tx will not be lost if the process restarts. You could change from sqlite to other storage if desired.
+
+### Methods
 | method               |   Detail  
 |----------------------|--------------------------------------------------------------
-|  init(initConfig)    |   Init an schedule task, interval check status of array txs
-|  addTx(TxData)       |   Add an tx to queue
-|  removeTx(hash)      |   Remove tx from queue           
+|  init(options)       |   Init the monitor-tx instance
+|  addTx(txData)       |   Add an tx to queue
+|  removeTx(txHash)    |   Remove tx from queue           
 
 First we need init monitor task
 ```javascript
 var monitorTx = require('monitor-tx');
-
-monitorTx.init({params})
+var options = {...};
+monitorTx.init(options)
 
 ```
-we can pass manual config for monitor task
+Currently, the following options are supported.
 
 |     field               |        value                         |      Detail                                                                      |
 |-------------------------|--------------------------------------|----------------------------------------------------------------------------------|
-|     nodes               |     Array<string>                    |    Array url of node, match with network                                         |
-|     network             |     'ropsten'/'mainnet'/'kovan'      |    Network of transaction base on                                                |
-|     expression          |     "* * * * *"                      |    Cron Syntax                                                                   |
-|     blockConfirm        |     Number                           |    Number of block confirm                                                       |
-|     lostTimeout         |     Number(second)                   |    Time to check transaction is lost                                             |
-|     includeReceipt      |     Bolean                           |    Is include receipt to confirmCallback data                                    |
-|     sqlPath             |     String                           |    Path to sqlite db                                                             |
-|     mineCallback        |     Function                         |    Callback call each time cron fetched tx data, but confirm block is not enough |
-|     confirmCallback     |     Function                         |    Callback call when block confirm is enough or tx lost                         |
-|     sqlIntance          |     Class                            |    Database instance                                                             |
+|     nodes               |     Array<string>                    |    Array of URLS of nodes                                         |
+|     network             |     'ropsten'/'mainnet'/'kovan'      |    Ethereum network                                                |
+|     expression          |     "* * * * *"                      |    Cron Syntax for polling interval                                                                   |
+|     blockConfirm        |     Number                           |    Number of block confirmation                                                       |
+|     lostTimeout         |     Number (in seconds)              |    Time until declare a tx is lost                                             |
+|     includeReceipt      |     Bolean                           |    Whether receipt data is pass to to confirmCallback                                    |
+|     sqlPath             |     String                           |    Path to sqlite DB, set if you use Sqlite as tx storage                                                             |
+|     mineCallback        |     Function                         |    Callback when tx is mined |
+|     confirmCallback     |     Function                         |    Callback when tx is confirmed (successful, failed, or lost)                         |
+|     sqlIntance          |     Class                            |    Storage instance to use instead of sqlite. See later section for details.                                                            |
 
-Default value:
+Default values:
 ```
   nodes = ['https://ropsten.infura.io']
   network = 'ropsten' 
@@ -56,7 +63,7 @@ Default value:
 
 #### Cron Syntax
 
-This is a quick reference to cron syntax and also shows the options supported by node-cron.
+This is a quick reference to cron syntax. For more details, please [refer here](http://www.nncron.ru/help/EN/working/cron-format.htm).
 
 Allowed fields
 
@@ -71,7 +78,7 @@ Allowed fields
  # │ │ │ │ │ │
  # * * * * * *
 
- */2 * * * *          //running a task every two minutes
+ */2 * * * *          // running a task every two minutes
 ```
 
 Allowed values
@@ -105,10 +112,10 @@ The following example shows some of these features:
 const monitorTx = require('monitor-tx');
 
 const mineCallback = (err, result) => {
-  console.log("-----------", err, result)
+  console.log("MINED!", err, result)
 }
 const confirmCallback = (err, result) => {
-  console.log("=====================confirm callback", err, result)
+  console.log("CONFIRMED!", err, result)
   // checked data is in result.confirm
   if(result.confirm && result.confirmTransaction.status == 'success'){
     // transaction success, save result.hash to database
@@ -118,7 +125,7 @@ monitorTx.init({
   nodes : ['https://mainnet.infura.io'],
   network : 'mainnet',
   expression : "*/30 * * * * *";,  //  every 30s
-  blockConfirm : 15,                // confirmCallback fill call after tx has over 15 blocks confirm
+  blockConfirm : 15,                // confirmCallback fill call after tx has over 15 blocks confirmation
   lostTimeout : 20 * 60,            // if there is no data of tx after 20 MINS, tx will marked as lost and remove from queue
   includeReceipt : true ,          // include receipt in confirmCallback data
   sqlPath : './src/db/txs.db',      // sqlite path inside nodemodule, you can set to specific path inside project
@@ -185,26 +192,36 @@ err: null
 ```
 
 
-#### abtract database
-you can manual option which database use by passing database instance to config.
-Database instance is an class which contain all of this method:
+#### Use custom tx storage
+You could change the tx storage from SqLite to one of your own (e.g. in-memory, file, MySql, MongoDB, etc.) by passing a storage object to monitor-tx's `init` method.
+
+Example:
+```javascript
+const monitorTx = require('monitor-tx');
+var myCustomStorageInstance = {...};
+monitorTx.init({
+  sqlIntance: myCustomStorageInstance
+})
+```
+
+Storage instance must be an object with the following functions:
 
 ```javascript
   /**
-   * Find tx by hash
+   * Find tx by tx hash
    * @param {string} hash 
    * @param {function} callback 
    */
   findByHash(hash, callback)
 
   /**
-   * Get call txs in database
-   * @param {function} callback 
+   * Get all txs in storage
+   * @param {function} callback
    */
   getAll(callback)
 
   /**
-   * Add tx to database
+   * Add tx to storage
    * @param {tx object data} data 
    * {
    *      hash: String,
@@ -216,14 +233,16 @@ Database instance is an class which contain all of this method:
   addTx(data, callback)
 
   /**
-   * remove tx with hash from database
+   * remove tx with hash from storate
    * @param {string} hash 
    * @param {function} callback 
    */
   removeTxByHash(hash, callback)
 ```
 
-txs schema
+#### SqLite schema
+
+If you use the default SqLite storage, a SqLite DB will be created with the following table schema.
 ```
 hash: String,
 blockConfirm: Number,
@@ -231,7 +250,4 @@ timeStamp: Number,
 amount: String,
 symbol: String
 ```
-
-
-
 
