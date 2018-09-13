@@ -193,13 +193,6 @@ app.post('/payment/callback', function(req, res, next) {
   confirmTransaction: { status: 'success', amount: 0.7653, symbol: 'KNC' } }
 ```
 
-when tx pending
-```
-err: null 
-{ pending: true }
-```
-
-
 #### Use custom tx storage
 You could change the tx storage from default of SqLite to one of your own (e.g. in-memory, file, MySql, MongoDB, etc.) by passing a storage object to monitor-tx's `init` method.
 
