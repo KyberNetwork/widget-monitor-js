@@ -242,7 +242,7 @@ Storage instance must be an object with the following functions:
 
 #### SqLite schema
 
-If you use the default SqLite storage, a SqLite DB will be created with the following table schema.
+If you use the default SqLite storage, a SqLite table named `txs' will be created if not existed with the following table schema.
 ```
 hash: String,
 blockConfirm: Number,
