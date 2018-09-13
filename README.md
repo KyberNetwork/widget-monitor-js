@@ -19,7 +19,7 @@ When user makes a transaction, the workflow is as following:
 
 Internally, the monitor-tx instance periodically polls blockchain nodes to query tx status. The polling interval is configurable.
 
-By default, monitor-tx persist tx queue to a Sqlite DB, so tx will not be lost if the process restarts. You could change from sqlite to other storage if desired.
+By default, monitor-tx persist the tx queue to a SqLite DB, so transactions will not be lost if the process restarts. You could change from sqlite to other storage if desired.
 
 ### Methods
 | method               |   Detail  
