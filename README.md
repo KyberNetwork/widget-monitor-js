@@ -112,7 +112,7 @@ monitorTx.removeTx("0xe763ffe95d02e231f1d745...8bf604953077fefc1eef369e901e")
 
 ```
 
-The following example shows some of these features:
+The following example shows how to use this module:
 
 
 ```javascript
@@ -123,19 +123,20 @@ const mineCallback = (err, result) => {
 }
 const confirmCallback = (err, result) => {
   console.log("CONFIRMED!", err, result)
-  // checked data is in result.confirm
+  // checked if tx is successful
   if(result.confirm && result.confirmTransaction.status == 'success'){
-    // transaction success, save result.hash to database
+    // transaction succeeded
+    console.log("Tx succedded");
   }
 }
 monitorTx.init({
   nodes : ['https://mainnet.infura.io'],
   network : 'mainnet',
   expression : "*/30 * * * * *";,  //  every 30s
-  blockConfirm : 15,                // confirmCallback fill call after tx has over 15 blocks confirmation
-  lostTimeout : 20 * 60,            // if there is no data of tx after 20 MINS, tx will marked as lost and remove from queue
-  includeReceipt : true ,          // include receipt in confirmCallback data
-  sqlPath : './src/db/txs.db',      // sqlite path inside nodemodule, you can set to specific path inside project
+  blockConfirm : 15,
+  lostTimeout : 20 * 60, // 1200 seconds = 20 minutes
+  includeReceipt : true,
+  sqlPath : './src/db/txs.db',
   mineCallback: mineCallback,
   confirmCallback: confirmCallback
 })
@@ -143,7 +144,7 @@ monitorTx.init({
 
 app.post('/payment/callback', function(req, res, next) {
   data = req.body
-  // Add tx to monitorTx process
+  // Add tx to queue
   monitorTx.addTx({
     hash: data.tx,
     amount: data.paymentAmount,
@@ -200,7 +201,7 @@ err: null
 
 
 #### Use custom tx storage
-You could change the tx storage from SqLite to one of your own (e.g. in-memory, file, MySql, MongoDB, etc.) by passing a storage object to monitor-tx's `init` method.
+You could change the tx storage from default of SqLite to one of your own (e.g. in-memory, file, MySql, MongoDB, etc.) by passing a storage object to monitor-tx's `init` method.
 
 Example:
 ```javascript
