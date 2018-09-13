@@ -15,11 +15,18 @@ When user makes a transaction, the workflow is as following:
 1. Kyber Widget calls your supplied callback URL, passing the tx hash
 2. Your server code then need to add the tx hash to monitor-tx queue, passing mineCallback and confirmCallback as parameters
 3. Monitor-tx calls your mineCallback when the tx gets mined, however it will not be considered as a successful tx until a certain number of block confirmation.
-4. Monitor-tx calls your confirmCallback when the tx is mined and persisted for at least a certain number of block confirmation or the tx is considered lost for being notfound for more than 15 minutes. At this point, status of the tx can be `lost`, `success`, `failed`.
+4. Monitor-tx calls your confirmCallback when the tx is mined and persisted for at least a certain number of block confirmation or the tx is considered lost for being notfound for more than 15 minutes. At this point, status of the tx can be `lost`, `success`, `failed`, `invalid`.
+
+The tx is considered invalid if one of the following is true.
+1. The receiving address is different from receiveAddr passed Kyber Widget
+2. The receiving token is different from receiveToken passed to Kyber Widget
+3. The receiving amount is less than receiveAmount passed to Kyber Widget
+
+Within confirmCallback, make sure to check if status is `success` before proceeding.
 
 Internally, the monitor-tx instance periodically polls blockchain nodes to query tx status. The polling interval is configurable.
 
-By default, monitor-tx persist the tx queue to a SqLite DB, so transactions will not be lost if the process restarts. You could change from sqlite to other storage if desired.
+By default, monitor-tx persist the tx queue to a SqLite DB, so transactions will not be lost if the process restarts. You could change from SqLite to other storage if desired.
 
 ### Methods
 | method               |   Detail  
@@ -93,7 +100,7 @@ Allowed values
 |  day of week |     0-7 (or names, 0 or 7 are sunday)  |
 
 #### addTx/removeTx
-Add an transaction with hash and data (amount, token symbol) to queue, schedule task will auto check and validate with tx data fetched from network
+Add an transaction with hash and data (amount, token symbol) to queue.
 ```javascript
 monitorTx.addTx({
   hash: "0xe763ffe95d02e231f1d745...8bf604953077fefc1eef369e901e",
@@ -242,7 +249,7 @@ Storage instance must be an object with the following functions:
 
 #### SqLite schema
 
-If you use the default SqLite storage, a SqLite table named `txs' will be created if not existed with the following table schema.
+If you use the default SqLite storage, a SqLite table named `txs` will be created if not existed with the following table schema.
 ```
 hash: String,
 blockConfirm: Number,
