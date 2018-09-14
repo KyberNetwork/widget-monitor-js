@@ -151,7 +151,8 @@ module.exports = class ScheduleTask {
         console.log(err)
         const now = new Date().getTime()
         if(now - tx.timeStamp > this.lostTimeout) return finishCallback(null, { status: CONSTANTS.TRANSACTION_STATUS.LOST})
-        else return callback(null, {pending: true})
+        else return 
+        // callback(null, {pending: true})
       }
 
       const blockRange = converter.minusBig(results.currentBlock, results.confirm.blockNumber)
