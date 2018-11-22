@@ -1,4 +1,5 @@
 const BigNumber = require('bignumber.js')
+const Web3 = require("web3")
 
 module.exports = {
   toToken(number, decimal = 18) {
@@ -61,6 +62,11 @@ module.exports = {
     let bigNumber = number ? new BigNumber(number) : new BigNumber(0)
     let bigBase = base ? new BigNumber(base) : new BigNumber(0)
     return bigNumber.isLessThan(bigBase)
+  },
+
+  decodeHexToAddress(hex){
+    const bigHex = new BigNumber(hex.toString())
+    return '0x' + bigHex.toString(16)
   }
 
 }

@@ -73,6 +73,26 @@ module.exports = class BaseProvider {
     })
   }
 
+  exactPayData(data){
+    return new Promise((resolve, reject) => {
+      try {
+        var payAbi = this.getAbiByName("pay", CONSTANTS.PAY_ABI)
+        abiDecoder.addABI(payAbi)
+        var decoded = abiDecoder.decodeMethod(data);
+        var arrayParams = decoded.params
+        var paramsObj = {}
+        arrayParams.map(a => paramsObj[a.name] = a.value)
+        resolve(paramsObj)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  decodeHexAddress(data){
+    return Promise.resolve(this.rpc.eth.abi.decodeParameters(['address'], data)) 
+  }
+
 
   exactTransferData(data) {
     return new Promise((resolve, reject) => {
@@ -118,6 +138,38 @@ module.exports = class BaseProvider {
             type: 'uint256',
             name: 'destAmount'
           }
+      ], data)
+        resolve(dataMapped)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  exactPayData(data) {
+    return new Promise((resolve, reject) => {
+      try {
+        var dataMapped = this.rpc.eth.abi.decodeParameters([
+          // {
+          //   type: 'address',
+          //   name: '_payer'
+          // },
+          // {
+          //   type: 'address',
+          //   name: '_payee'
+          // },
+          {
+            type: 'address',
+            name: '_token'
+          },
+          {
+            type: 'uint256',
+            name: '_amount'
+          },
+          {
+            type: 'bytes',
+            name: '_data'
+          },
       ], data)
         resolve(dataMapped)
       } catch (e) {

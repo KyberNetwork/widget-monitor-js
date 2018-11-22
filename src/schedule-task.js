@@ -73,6 +73,39 @@ module.exports = class ScheduleTask {
     .catch(callback)
   }
 
+  processPay(txData, receipt, callback){
+    const receiptLogs = receipt.logs
+    const indexPayLog = receiptLogs.map(l => l.topics[0]).indexOf(CONSTANTS.PROOF_OF_PAYMENT_TOPIC)
+    
+    if(indexPayLog < 0) return callback("Transaction not use Pay with Kyber!")
+    else {
+      // const destAddr = 
+      const destAddr = converter.decodeHexToAddress(receiptLogs[indexPayLog].topics[2]) 
+      const dataPay = receiptLogs[indexPayLog].data
+      this.EthereumService.callMultiNode('exactPayData', dataPay)
+      .then(payExtractData => {
+
+        const tokenSymbol = this.MappedTokens[payExtractData._token.toLowerCase()]
+
+        if(!tokenSymbol) return callback(`Token (${payExtractData._token}) not supported by kyber!`)
+        const tokenAmount = converter.toToken(payExtractData._amount, this.BlockchainInfo.tokens[tokenSymbol].decimals)
+        return callback(null, {
+          type: 'pay',
+          blockNumber: txData.blockNumber,
+          from: txData.from,
+          to: destAddr,
+
+          amount: tokenAmount,
+          tokenSymbol: tokenSymbol,
+          tokenName: this.BlockchainInfo.tokens[tokenSymbol].name,
+        })
+
+      })
+      .catch(err => console.log(err))
+    }
+
+  }
+
   processTransfer(txData, callback){
     if (converter.isZero(txData.value)) {
       // transfer token
@@ -130,7 +163,11 @@ module.exports = class ScheduleTask {
   getConfirmData(hash, receipt, callback){
     this.EthereumService.callMultiNode('getTx', hash)
     .then(txData => {
-      if (txData.to.toLowerCase() == this.BlockchainInfo.network.toLowerCase()) {
+      if(txData.to.toLowerCase() == this.BlockchainInfo.wrapper.toLowerCase()){
+        // handle with new wrapper
+        return this.processPay(txData, receipt, callback)
+      }
+      else if (txData.to.toLowerCase() == this.BlockchainInfo.network.toLowerCase()) {
         return this.processTrade(txData, receipt, callback)
       } else {
         return this.processTransfer(txData, callback)

@@ -7,7 +7,8 @@ monitorTx.init({
   },
   confirmCallback: (err, txData) => {
     console.log("_____________-finishCallback", err, txData)
-  }
+  },
+  includeReceipt: true
 })
 
 // setTimeout(() => {
@@ -23,7 +24,7 @@ monitorTx.init({
 
 setTimeout(() => {
   monitorTx.addTx({
-    hash: "0x4df564345381513726326cbeb3a60a8005582333996d45fba9fdeddaa7fc5a10",
+    hash: "0xe85faba1e403dc3fbef85e1d66fb1b7f1da85e237e5df80350eaa68cbc605d15",
     amount: '0.7653',
     symbol: 'KNC'
   })
