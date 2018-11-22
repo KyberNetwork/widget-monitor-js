@@ -5,7 +5,8 @@ const DEFAULT_NODE = ['https://ropsten.infura.io']
 const DEFAULT_NETWORK = 'ropsten' // mainnet/ropsten/kovan
 const DEFAULT_GET_RECEIPT = false
 const DEFAULT_MAX_PROCESS_TXS = 5
-const TRADE_TOPPIC = "0x1849bd6a030a1bca28b83437fd3de96f3d27a5d172fa7e9c78e7b61468928a39"
+// const TRADE_TOPPIC = "0x1849bd6a030a1bca28b83437fd3de96f3d27a5d172fa7e9c78e7b61468928a39"
+const TRADE_TOPPIC = "0x1c8399ecc5c956b9cb18c820248b10b634cca4af308755e07cd467655e8ec3c7"
 const DEFAULT_SQL_PATH = './monitor-tx.db'
 
 const DEFAULT_MINE_CALLBACK = () => {}

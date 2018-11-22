@@ -36,6 +36,7 @@ module.exports = class BaseProvider {
   }
 
   getTx(txHash) {
+    console.log("**************** get txhash:", txHash)
     return new Promise((resolve, rejected) => {
       this.rpc.eth.getTransaction(txHash).then((result) => {
         if (result != null) {
@@ -95,19 +96,27 @@ module.exports = class BaseProvider {
         var dataMapped = this.rpc.eth.abi.decodeParameters([
           {
             type: 'address',
-            name: 'src'
+            name: 'srcAddress'
           },
           {
             type: 'address',
-            name: 'dest'
+            name: 'srcToken'
           },
           {
             type: 'uint256',
-            name: 'actualSrcAmount'
+            name: 'srcAmount'
+          },
+          {
+            type: 'address',
+            name: 'destAddress'
+          },
+          {
+            type: 'address',
+            name: 'destToken'
           },
           {
             type: 'uint256',
-            name: 'actualDestAmount'
+            name: 'destAmount'
           }
       ], data)
         resolve(dataMapped)

@@ -42,12 +42,11 @@ module.exports = class ScheduleTask {
         const dataTrade = receiptLogs[indexExecuteTradeLog].data
         this.EthereumService.callMultiNode('exactExecuteTradeData', dataTrade)
         .then(tradeExtractData => {
-          const srcTokenSymbol = this.MappedTokens[tradeExtractData.src.toLowerCase()]
-          const srcAmount = converter.toToken(tradeExtractData.actualSrcAmount, this.BlockchainInfo.tokens[srcTokenSymbol].decimals)
+          const srcTokenSymbol = this.MappedTokens[tradeExtractData.srcToken.toLowerCase()]
+          const srcAmount = converter.toToken(tradeExtractData.srcAmount, this.BlockchainInfo.tokens[srcTokenSymbol].decimals)
 
-          const tokenSymbol = this.MappedTokens[tradeExtractData.dest.toLowerCase()]
-          const amount = converter.toToken(tradeExtractData.actualDestAmount, this.BlockchainInfo.tokens[tokenSymbol].decimals)
-
+          const tokenSymbol = this.MappedTokens[tradeExtractData.destToken.toLowerCase()]
+          const amount = converter.toToken(tradeExtractData.destAmount, this.BlockchainInfo.tokens[tokenSymbol].decimals)
           return callback(null, {
             type: 'trade',
             blockNumber: txData.blockNumber,
