@@ -6,8 +6,6 @@ const ScheduleTask = require('./schedule-task')
 const EthereumService = require('./ethereum/ethereum')
 // var txs = []
 
-const Txs = require('./persit/sqlite.storage')
-
 
 const init = (config) => {
   //todo init task schedule with params
@@ -37,36 +35,37 @@ const init = (config) => {
   var confirmCallback = config.confirmCallback || CONSTANTS.DEFAULT_CONFIRM_CALLBACK
   var sqlPath = config.sqlPath || CONSTANTS.DEFAULT_SQL_PATH
 
-  this.txs = config.sqlIntance || new Txs(sqlPath)
-  this.txs.initDb((err, result) => {
-    if(err) return console.log(err)
 
-    var ethereumService = new EthereumService(arrayNodes)
-    const params = {
-      ethereumService, 
-      network, 
-      getReceipt, 
-      globalBlockConfirm, 
-      lostTimeout, 
-      maxProcessTxs,
-      mineCallback,
-      confirmCallback
-    }
-    var scheduleTask = new ScheduleTask(params)
-
-    // this.txs.updatetimeStampTxs()
-
-    cron.schedule(expression, () => {
-      this.txs.getAll( (err, txs) => {
-        if(err) return
-        scheduleTask.exec(txs, (tx) => {
-          removeTx(tx.hash)
+  var ethereumService = new EthereumService(arrayNodes)
+  const params = {
+    ethereumService, 
+    network, 
+    getReceipt, 
+    globalBlockConfirm, 
+    lostTimeout, 
+    maxProcessTxs,
+    mineCallback,
+    confirmCallback
+  }
+  this.scheduleTask = new ScheduleTask(params)
+  if(!config.noPersit){
+    const Txs = require('./persit/sqlite.storage')
+    this.txs = config.sqlIntance || new Txs(sqlPath)
+    this.txs.initDb((err, result) => {
+      if(err) return console.log(err)
+  
+      cron.schedule(expression, () => {
+        this.txs.getAll( (err, txs) => {
+          if(err) return
+          this.scheduleTask.exec(txs, (tx) => {
+            removeTx(tx.hash)
+          })
         })
-      })
-    });
-
-
-  })
+      });
+  
+    })
+  }
+   
 
   
 }
@@ -117,6 +116,10 @@ const removeTx = (hash) => {
   this.txs.removeTxByHash(hash, err => console.log(err))
 }
 
+const utils = {
+  execTx: (txObj, callback) => this.scheduleTask.processTx(txObj, callback)
+}
+
 module.exports = {
-  init, addTx, removeTx
+  init, addTx, removeTx, utils
 }

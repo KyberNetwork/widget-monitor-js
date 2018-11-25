@@ -11,16 +11,6 @@ monitorTx.init({
   includeReceipt: true
 })
 
-// setTimeout(() => {
-//   console.log("___________-add tx")
-//   monitorTx.addTx({
-//     hash: "0xd910078d3c2630acfdf15c0f72b09d0808639fcc5323ea6fe054e9444f90525d",
-//     amount: '0.7653',
-//     symbol: 'KNC'
-//   })
-// }, 5000)
-
-
 
 setTimeout(() => {
   monitorTx.addTx({
@@ -29,3 +19,20 @@ setTimeout(() => {
     symbol: 'KNC'
   })
 }, 6000)
+
+
+
+// monitorTx.init({
+//   noPersit: true
+// })
+
+// setTimeout(() => {
+//   monitorTx.utils.execTx({
+//     hash: "0xe85faba1e403dc3fbef85e1d66fb1b7f1da85e237e5df80350eaa68cbc605d15",
+//     amount: '0.7653',
+//     symbol: 'KNC'
+//   }, (err, data) => {
+//     console.log("*******************", err, data)
+//   })
+// }, 6000)
+

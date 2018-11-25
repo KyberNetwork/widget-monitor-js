@@ -177,6 +177,7 @@ module.exports = class ScheduleTask {
   }
 
   processTx(tx, callback, finishCallback) {
+    console.log("_____________________process tx", tx)
     async.auto({
       receipt: asyncCallback => this.getTransactionReceipt(tx.hash, asyncCallback),
       currentBlock: asyncCallback => this.getCurrentBlock(asyncCallback),
@@ -186,7 +187,7 @@ module.exports = class ScheduleTask {
         /// handle tx pending or lost
         console.log(err)
         const now = new Date().getTime()
-        if(now - tx.timeStamp > this.lostTimeout) return finishCallback(null, { status: CONSTANTS.TRANSACTION_STATUS.LOST})
+        if(tx.timeStamp && now - tx.timeStamp > this.lostTimeout) return finishCallback && finishCallback(null, { status: CONSTANTS.TRANSACTION_STATUS.LOST})
         else return 
         // callback(null, {pending: true})
       }
@@ -215,7 +216,7 @@ module.exports = class ScheduleTask {
       if(blockRange > confirmBlock){
         //todo push finish callback
         // clear tx from array
-        return finishCallback(null, {
+        return (finishCallback || callback)(null, {
           hash: tx.hash,
           data: results.confirm,
           confirmBlock: blockRange,

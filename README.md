@@ -151,7 +151,23 @@ app.post('/payment/callback', function(req, res, next) {
     symbol: data.paymentToken
   })
 });
+```
 
+#### useage of no persit, just verify status only
+Monitor-tx can run no-persit mode, execTx will return tx status immediately
+
+```javascript
+monitorTx.init({
+  noPersit: true
+})
+
+monitorTx.utils.execTx({
+  hash: "0xe85faba1e403dc3fbef85e1d66fb1b7f1da85e237e5df80350eaa68cbc605d15",
+  amount: '0.7653',
+  symbol: 'KNC'
+}, (err, data) => {
+  console.log("*******************", err, data)
+})
 ```
 
 
