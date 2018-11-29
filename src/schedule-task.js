@@ -23,6 +23,8 @@ module.exports = class ScheduleTask {
 
     this.mineCallback = props.mineCallback
     this.confirmCallback = props.confirmCallback
+
+    this.noPersit = props.noPersit
   }
 
   processTrade(txData, receipt, callback){
@@ -185,6 +187,7 @@ module.exports = class ScheduleTask {
     }, (err, results) => {
       if(err) {
         /// handle tx pending or lost
+        if(this.noPersit) return callback(err)
         console.log(err)
         const now = new Date().getTime()
         if(tx.timeStamp && now - tx.timeStamp > this.lostTimeout) return finishCallback && finishCallback(null, { status: CONSTANTS.TRANSACTION_STATUS.LOST})

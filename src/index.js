@@ -45,7 +45,8 @@ const init = (config) => {
     lostTimeout, 
     maxProcessTxs,
     mineCallback,
-    confirmCallback
+    confirmCallback,
+    noPersit: config.noPersit
   }
   this.scheduleTask = new ScheduleTask(params)
   if(!config.noPersit){
