@@ -438,7 +438,7 @@
       "symbol" : "WETH",
       "decimals": 18,
       "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "hidden": 1536846367000,
+      "hidden": 1536846367000
     },
 
     "MAS":{
@@ -561,5 +561,6 @@
     }
   ],
   "network": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
-  "wrapper": "0x5211e6196d2a8e4ea7ee3dd961c8d667fbc4727c"
+  "wrapper": "0x5211e6196d2a8e4ea7ee3dd961c8d667fbc4727c",
+  "switchKyberTradeBlock": 7024980
 }

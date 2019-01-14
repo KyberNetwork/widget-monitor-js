@@ -18,5 +18,6 @@
       "type": "prune"
     }
   ],
-  "network": "0x0a56d8a49E71da8d7F9C65F95063dB48A3C9560B"
+  "network": "0x0a56d8a49E71da8d7F9C65F95063dB48A3C9560B",
+  "switchKyberTradeBlock": 7024980
 }

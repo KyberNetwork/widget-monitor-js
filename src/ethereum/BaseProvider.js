@@ -73,6 +73,22 @@ module.exports = class BaseProvider {
     })
   }
 
+  exactTradeWithHintData(data){
+    return new Promise((resolve, reject) => {
+      try {
+        var ieoAbi = this.getAbiByName("tradeWithHint", CONSTANTS.KYBER_ABI)
+        abiDecoder.addABI(ieoAbi)
+        var decoded = abiDecoder.decodeMethod(data);
+        var arrayParams = decoded.params
+        var paramsObj = {}
+        arrayParams.map(a => paramsObj[a.name] = a.value)
+        resolve(paramsObj)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
   exactPayData(data){
     return new Promise((resolve, reject) => {
       try {
@@ -137,6 +153,58 @@ module.exports = class BaseProvider {
           {
             type: 'uint256',
             name: 'destAmount'
+          }
+      ], data)
+        resolve(dataMapped)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  extractKyberTradeData(data){
+    return new Promise((resolve, reject) => {
+      try {
+        var dataMapped = this.rpc.eth.abi.decodeParameters([
+          {
+            type: 'address',
+            name: 'srcAddress'
+          },
+          {
+            type: 'address',
+            name: 'srcToken'
+          },
+          {
+            type: 'address',
+            name: 'destToken'
+          },
+          {
+            type: 'uint256',
+            name: 'srcAmount'
+          },
+          {
+            type: 'uint256',
+            name: 'destAmount'
+          },
+          {
+            type: 'address',
+            name: 'destAddress'
+          },
+          {
+            type: 'uint256',
+            name: 'ethValue'
+          },
+          {
+            type: 'address',
+            name: 'reserve1'
+          },
+          {
+            type: 'address',
+            name: 'reserve2'
+          },
+          {
+            type: 'uint256',
+            name: 'hint'
           }
       ], data)
         resolve(dataMapped)

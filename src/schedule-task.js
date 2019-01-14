@@ -31,18 +31,42 @@ module.exports = class ScheduleTask {
     // console.log("===================receip", receipt)
     this.EthereumService.callMultiNode('exactTradeData', txData.input)
     .then(tradeData => {
-      const inputTokenSymbol = this.MappedTokens[tradeData.src.toLowerCase()]
+      this.processTradeData(tradeData, txData, receipt, callback)
+    })
+    .catch(callback)
+  }
+
+  processTradeWithHint(txData, receipt, callback){
+    this.EthereumService.callMultiNode('exactTradeWithHintData', txData.input)
+    .then(tradeData => {
+      this.processTradeData(tradeData, txData, receipt, callback)
+    })
+    .catch(callback)
+  }
+
+
+  processTradeData(tradeData, txData, receipt, callback){
+    const inputTokenSymbol = this.MappedTokens[tradeData.src.toLowerCase()]
       if(!inputTokenSymbol) return callback("token not support by Kyber!")
 
       const inputAmount = converter.toToken(tradeData.srcAmount, this.BlockchainInfo.tokens[inputTokenSymbol].decimals)
 
       const receiptLogs = receipt.logs
       const indexExecuteTradeLog = receiptLogs.map(l => l.topics[0]).indexOf(CONSTANTS.TRADE_TOPPIC)
-      
-      if(indexExecuteTradeLog < 0) return callback("Transaction not use ExecuteTrade of KYber!")
+      const indexKyberTadeLog = receiptLogs.map(l => l.topics[0]).indexOf(CONSTANTS.KYBER_TRADE_TOPPIC)
+      let indexTrade, executeFunc
+      if(txData.blockNumber < this.network.switchKyberTradeBlock){
+        indexTrade = receiptLogs.map(l => l.topics[0]).indexOf(CONSTANTS.TRADE_TOPPIC)
+        executeFunc = 'exactExecuteTradeData'
+      } else {
+        indexTrade = receiptLogs.map(l => l.topics[0]).indexOf(CONSTANTS.KYBER_TRADE_TOPPIC)
+        executeFunc = 'extractKyberTradeData'
+      }
+
+      if(indexTrade < 0) return callback("Transaction not use  KYber!")
       else {
-        const dataTrade = receiptLogs[indexExecuteTradeLog].data
-        this.EthereumService.callMultiNode('exactExecuteTradeData', dataTrade)
+        const dataTrade = receiptLogs[indexTrade].data
+        this.EthereumService.callMultiNode(executeFunc, dataTrade)
         .then(tradeExtractData => {
           const srcTokenSymbol = this.MappedTokens[tradeExtractData.srcToken.toLowerCase()]
           const srcAmount = converter.toToken(tradeExtractData.srcAmount, this.BlockchainInfo.tokens[srcTokenSymbol].decimals)
@@ -71,8 +95,6 @@ module.exports = class ScheduleTask {
         })
         .catch(err => console.log(err))
       }
-    })
-    .catch(callback)
   }
 
   processPay(txData, receipt, callback){
@@ -163,15 +185,24 @@ module.exports = class ScheduleTask {
   }
 
   getConfirmData(hash, receipt, callback){
+    
     this.EthereumService.callMultiNode('getTx', hash)
     .then(txData => {
+      
       if(txData.to.toLowerCase() == this.BlockchainInfo.wrapper.toLowerCase()){
         // handle with new wrapper
+        console.log("****************** process pay")
         return this.processPay(txData, receipt, callback)
       }
       else if (txData.to.toLowerCase() == this.BlockchainInfo.network.toLowerCase()) {
-        return this.processTrade(txData, receipt, callback)
+        if(txData.input.length > 458){
+          return this.processTradeWithHint(txData, receipt, callback)
+        } else {
+          return this.processTrade(txData, receipt, callback)
+        }
+        
       } else {
+        console.log("****************** process transfer")
         return this.processTransfer(txData, callback)
       }
     })
